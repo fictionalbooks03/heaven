@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Heaven Scroll Effect</title>
+
+<style>
+  body {
+    margin: 0;
+    height: 300vh; /* long page for scroll */
+    background-color: black;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    font-family: "Lucida Handwriting", cursive;
+  }
+
+  #heaven {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 5vw;
+    color: darkred;
+    font-family: "Courier New", monospace;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    transition: font-family 1s ease, color 1s ease;
+  }
+
+  /* Optional chalk texture look */
+  @keyframes chalky {
+    from { text-shadow: 0 0 5px rgba(255, 255, 255, 0.1); }
+    to { text-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
+  }
+  #heaven.chalk {
+    animation: chalky 1s infinite alternate;
+  }
+</style>
+</head>
+
+<body>
+  <div id="heaven" class="chalk">heaven</div>
+  <audio id="omAudio" src="om.mp3"></audio>
+
+  <script>
+    const heaven = document.getElementById("heaven");
+    const audio = document.getElementById("omAudio");
+
+    // play audio on first user click
+    document.body.addEventListener("click", () => {
+      audio.play().catch(err => console.log("Audio play failed:", err));
+    }, { once: true });
+
+    // scroll effect
+    window.addEventListener("scroll", () => {
+      const scrollY = window.scrollY;
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const progress = Math.min(scrollY / maxScroll, 1);
+
+      // font size: grows from 5vw to 25vw
+      const size = 5 + progress * 20;
+      heaven.style.fontSize = `${size}vw`;
+
+      // color transition: dark red -> white
+      const r = Math.round(139 + (255 - 139) * progress);
+      const g = Math.round(0 + (255 - 0) * progress);
+      const b = Math.round(0 + (255 - 0) * progress);
+      heaven.style.color = `rgb(${r}, ${g}, ${b})`;
+
+      // font transition: chalk (Courier) to cursive (Lucida)
+      if (progress > 0.5) {
+        heaven.style.fontFamily = "'Lucida Handwriting', cursive";
+        heaven.classList.remove("chalk");
+      } else {
+        heaven.style.fontFamily = "'Courier New', monospace";
+        heaven.classList.add("chalk");
+      }
+
+      // depth effect: make it appear closer (scale + perspective)
+      const scale = 1 + progress * 2;
+      heaven.style.transform = `translateY(-50%) scale(${scale})`;
+    });
+  </script>
+</body>
+</html>
