@@ -8,79 +8,78 @@
 <style>
   body {
     margin: 0;
-    height: 300vh; /* long page for scroll */
+    height: 400vh; /* long page for scrolling effect */
     background-color: black;
     overflow-x: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    font-family: "Lucida Handwriting", cursive;
   }
 
   #heaven {
     position: fixed;
     top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
     font-size: 5vw;
     color: darkred;
     font-family: "Courier New", monospace;
-    text-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
-    transition: font-family 1s ease, color 1s ease;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+    transition: font-family 1s ease;
+    pointer-events: none; /* so clicks go through to body for audio */
   }
 
-  /* Optional chalk texture look */
-  @keyframes chalky {
-    from { text-shadow: 0 0 5px rgba(255, 255, 255, 0.1); }
-    to { text-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
+  @keyframes glow {
+    0% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+    100% { text-shadow: 0 0 30px rgba(255, 255, 255, 0.7); }
   }
-  #heaven.chalk {
-    animation: chalky 1s infinite alternate;
+
+  #heaven.glow {
+    animation: glow 2s infinite alternate;
   }
 </style>
 </head>
 
 <body>
-  <div id="heaven" class="chalk">heaven</div>
+  <div id="heaven">heaven</div>
   <audio id="omAudio" src="om.mp3"></audio>
 
   <script>
     const heaven = document.getElementById("heaven");
     const audio = document.getElementById("omAudio");
 
-    // play audio on first user click
+    // play audio once on first click
     document.body.addEventListener("click", () => {
       audio.play().catch(err => console.log("Audio play failed:", err));
     }, { once: true });
 
-    // scroll effect
+    // scroll-driven transformation
     window.addEventListener("scroll", () => {
       const scrollY = window.scrollY;
       const maxScroll = document.body.scrollHeight - window.innerHeight;
       const progress = Math.min(scrollY / maxScroll, 1);
 
-      // font size: grows from 5vw to 25vw
-      const size = 5 + progress * 20;
+      // font size: grows from 5vw → 35vw
+      const size = 5 + progress * 30;
       heaven.style.fontSize = `${size}vw`;
 
-      // color transition: dark red -> white
+      // color transition: dark red → white
       const r = Math.round(139 + (255 - 139) * progress);
       const g = Math.round(0 + (255 - 0) * progress);
       const b = Math.round(0 + (255 - 0) * progress);
       heaven.style.color = `rgb(${r}, ${g}, ${b})`;
 
-      // font transition: chalk (Courier) to cursive (Lucida)
+      // font-family shift
       if (progress > 0.5) {
         heaven.style.fontFamily = "'Lucida Handwriting', cursive";
-        heaven.classList.remove("chalk");
+        heaven.classList.add("glow");
       } else {
         heaven.style.fontFamily = "'Courier New', monospace";
-        heaven.classList.add("chalk");
+        heaven.classList.remove("glow");
       }
 
-      // depth effect: make it appear closer (scale + perspective)
-      const scale = 1 + progress * 2;
-      heaven.style.transform = `translateY(-50%) scale(${scale})`;
+      // depth illusion: subtle zoom
+      const scale = 1 + progress * 2.5;
+      heaven.style.transform = `translate(-50%, -50%) scale(${scale})`;
     });
   </script>
 </body>
 </html>
+
